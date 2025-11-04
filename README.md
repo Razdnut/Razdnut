@@ -1,0 +1,68 @@
+![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=28&duration=3000&pause=1000&color=00FFB3&center=true&vCenter=true&width=900&height=80&lines=Hi+there%21+I%27m+a+Razdnut+%F0%9F%91%8B)
+
+---
+
+## 👷‍♂️Profile
+
+Hobbyist passionate about **application development** mainly using **Next.js** and **React**. <br>
+*I lived my life quietly, but then I bought a server and discovered Github*
+Currently, I focus mainly on _vibe coding_.<br>
+I keep gaining experience to achieve better results.<br>
+_I am currently studying **Python**._
+
+<div align="center">
+
+![Skill Icons](https://skillicons.dev/icons?i=anaconda,cloudflare,c,bash,debian,docker,github,html,ai,npm,nodejs,nextjs,php,supabase,ubuntu,vercel,windows&perline=9)
+
+</div>
+
+---
+
+## 🛠️ Technical Skills
+
+- **Frontend:** Next.js, React, HTML, CSS
+- **Backend:** PHP, basic Node.js
+- **Other languages:** C, C#
+- **Fullstack & No-code:** Hands-on experience designing and developing from scratch
+- **Tools:** Git & GitHub, VS Code, Postman
+
+---
+
+## 🌱 Currently
+
+- 👨‍💻 Studying **Python** to expand my skill set.
+- 🚀 Always open to new technologies and programming languages!
+
+---
+
+## 🌐 Languages
+
+- 🇮🇹 **Italian:** Native
+- 🇬🇧 **English:** B2 (**FCE**)
+
+---
+
+## 📌 Featured Projects
+
+| 🧩 Project Name | 📝 Description | 🔗 Link |
+| --- | --- | --- |
+| **Audiodiary** | AudioDiary with Whisper Api model. | [GitHub](https://github.com/Razdnut/audiodiary) |
+| **Torna a Casa** | Small android app for monitor work-time | [GitHub](https://github.com/Razdnut/torna_a_casa) |
+
+---
+
+## 📫 Contacts
+
+- 👤 **GitHub:** [Razdnut](https://github.com/Razdnut)
+
+---
+
+<p align="center">
+
+<div align="center">
+
+  ![GitHub profile-details](http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Razdnut&theme=monokai)
+
+</div>
+
+</p>
