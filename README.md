@@ -4,7 +4,7 @@
 
 ## 👷‍♂️Profile
 
-Hobbyist passionate about **application development** mainly using **Next.js** and **React**. <br>
+Passionate about self-hosting. About **application development** mainly using **Next.js** and **React**. <br>
 *I lived my life quietly, but then I bought a server and discovered Github* <br>
 Currently, I focus mainly on _vibe coding_.<br>
 I keep gaining experience to achieve better results.<br>
@@ -23,7 +23,6 @@ _I am currently studying **Python**._
 - **Frontend:** Next.js, React, HTML, CSS
 - **Backend:** PHP, basic Node.js
 - **Other languages:** C, C#
-- **Fullstack & No-code:** Hands-on experience designing and developing from scratch
 - **Tools:** Git & GitHub, VS Code, Postman
 
 ---
