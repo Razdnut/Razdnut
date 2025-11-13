@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Razdnut • Dev Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfolio di Razdnut – app developer, self-hosting & vibe coding" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #050010;
+      --bg-alt: #090016;
+      --accent: #a855f7;
+      --accent-soft: rgba(168, 85, 247, 0.35);
+      --accent-strong: #c084fc;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --card: #0b021c;
+      --border-subtle: rgba(148, 163, 184, 0.15);
+      --danger: #fb7185;
+      --success: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none; /* custom cursor */
+    }
+
+    /* Animated gradient background layer */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      background: radial-gradient(circle at 0% 0%, rgba(168,85,247,0.25), transparent 55%),
+                  radial-gradient(circle at 100% 0%, rgba(59,130,246,0.25), transparent 55%),
+                  radial-gradient(circle at 50% 100%, rgba(236,72,153,0.3), transparent 55%);
+      opacity: 0.7;
+      mix-blend-mode: screen;
+      filter: blur(2px);
+      animation: gradient-move 22s ease-in-out infinite alternate;
+      z-index: -3;
+    }
+
+    @keyframes gradient-move {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      50% {
+        transform: translate3d(-4%, 2%, 0) scale(1.05);
+      }
+      100% {
+        transform: translate3d(3%, -3%, 0) scale(1.12);
+      }
+    }
+
+    /* Canvas for interactive particles */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.65;
+    }
+
+    /* Subtle vignette */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 10%, transparent 0, transparent 40%, rgba(0,0,0,0.75) 100%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Custom cursor */
+    .cursor-dot,
+    .cursor-outline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      z-index: 9999;
+    }
+
+    .cursor-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+      box-shadow: 0 0 12px rgba(192,132,252,0.9);
+    }
+
+    .cursor-outline {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(192,132,252,0.6);
+      box-shadow:
+        0 0 18px rgba(168,85,247,0.5),
+        0 0 40px rgba(59,130,246,0.35);
+      transition: transform 0.16s ease-out, width 0.16s ease-out, height 0.16s ease-out, border-color 0.16s ease-out;
+    }
+
+    .cursor-outline.cursor-hover {
+      width: 52px;
+      height: 52px;
+      border-color: rgba(244,244,245,0.9);
+    }
+
+    /* Layout */
+    .page {
+      position: relative;
+      min-height: 100vh;
+    }
+
+    .glow-top {
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(148,163,184,0.1), transparent 40%),
+        radial-gradient(circle at 20% 0%, rgba(248,250,252,0.05), transparent 60%);
+      mix-blend-mode: soft-light;
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom, rgba(5,0,16,0.9), rgba(5,0,16,0.4), transparent);
+      border-bottom: 1px solid rgba(148,163,184,0.25);
+    }
+
+    .nav {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .logo-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #f97316, #a855f7);
+      box-shadow:
+        0 0 20px rgba(168, 85, 247, 0.9),
+        0 0 40px rgba(59,130,246,0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-mark::after {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: conic-gradient(from 220deg, transparent 0 40%, rgba(248,250,252,0.9) 50%, transparent 60% 100%);
+      animation: logo-spin 4.5s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes logo-spin {
+      to {
+        transform: rotate(1turn);
+      }
+    }
+
+    .logo span {
+      background: linear-gradient(to right, #f9fafb, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      font-size: 0.85rem;
+    }
+
+    .nav-links a {
+      position: relative;
+      text-decoration: none;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-weight: 500;
+      font-size: 0.75rem;
+      padding-bottom: 0.2rem;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent-strong), #f97316);
+      transition: width 0.2s ease-out;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 0.35rem 0.9rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      background: radial-gradient(circle at 0 0, rgba(248,250,252,0.08), transparent 60%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-decoration: none;
+      transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out, transform 0.15s ease-out, background 0.2s ease-out;
+    }
+
+    .nav-cta span.icon {
+      font-size: 0.95rem;
+    }
+
+    .nav-cta:hover {
+      border-color: var(--accent-strong);
+      box-shadow: 0 0 22px rgba(168,85,247,0.5);
+      transform: translateY(-1px);
+      background: radial-gradient(circle at 100% 0, rgba(248,250,252,0.08), transparent 60%);
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 2.6rem 1.4rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3.4rem;
+    }
+
+    section {
+      position: relative;
+    }
+
+    /* Scroll reveal base */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
+      gap: 2.4rem;
+      align-items: center;
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .hero-visual {
+        order: -1;
+        justify-content: flex-start;
+      }
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.7);
+      padding: 0.2rem 0.6rem 0.2rem 0.25rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      margin-bottom: 0.9rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-kicker-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 12px rgba(34,197,94,0.8);
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 3.3vw + 1.4rem, 3.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title span.highlight {
+      background: linear-gradient(120deg, #f97316, #eab308, #a855f7, #6366f1);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: text-gradient 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes text-gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 460px;
+      line-height: 1.5;
+    }
+
+    .hero-subtitle strong {
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin: 1.3rem 0 1.6rem;
+    }
+
+    .tag {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      padding: 0.25rem 0.8rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: rgba(15,23,42,0.8);
+      backdrop-filter: blur(4px);
+    }
+
+    .tag span {
+      color: var(--accent-strong);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.15rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.15s ease-out, box-shadow 0.18s ease-out, border-color 0.15s ease-out, background 0.18s ease-out, color 0.18s ease-out;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at 0 0, #f97316, #a855f7 40%, #6366f1 90%);
+      color: var(--text);
+      box-shadow:
+        0 0 22px rgba(168,85,247,0.6),
+        0 0 40px rgba(37,99,235,0.4);
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(248,250,252,0.16), transparent 55%);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease-out;
+    }
+
+    .btn-primary:hover::after {
+      transform: translateX(80%);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px) scale(1.01);
+      box-shadow:
+        0 0 30px rgba(168,85,247,0.9),
+        0 0 55px rgba(37,99,235,0.6);
+    }
+
+    .btn-ghost {
+      background: rgba(15,23,42,0.8);
+      color: var(--muted);
+      border-color: rgba(148,163,184,0.4);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-strong);
+      color: var(--text);
+      transform: translateY(-1px);
+      box-shadow: 0 0 18px rgba(148,163,184,0.6);
+      background: linear-gradient(120deg, rgba(15,23,42,0.9), rgba(30,64,175,0.75));
+    }
+
+    .btn .arrow {
+      font-size: 1rem;
+      transform: translateX(0);
+      transition: transform 0.18s ease-out;
+    }
+
+    .btn:hover .arrow {
+      transform: translateX(2px);
+    }
+
+    .hero-meta {
+      margin-top: 1.1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+    }
+
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .hero-meta-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+      box-shadow: 0 0 14px rgba(192,132,252,0.9);
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: flex-end;
+      position: relative;
+    }
+
+    .hero-card {
+      position: relative;
+      border-radius: 1.6rem;
+      background: radial-gradient(circle at 0 0, rgba(248,250,252,0.12), transparent 55%),
+                  linear-gradient(145deg, rgba(15,23,42,0.97), rgba(15,23,42,0.6));
+      border: 1px solid rgba(148,163,184,0.3);
+      padding: 1.3rem 1.3rem 1.4rem;
+      max-width: 320px;
+      width: 100%;
+      box-shadow:
+        0 20px 40px rgba(15,23,42,0.9),
+        0 0 48px rgba(129,140,248,0.65);
+      overflow: hidden;
+      transform-origin: center;
+      animation: float-card 9s ease-in-out infinite alternate;
+    }
+
+    @keyframes float-card {
+      0% {
+        transform: translate3d(4px, -6px, 0) rotate(-1deg);
+      }
+      50% {
+        transform: translate3d(-4px, 6px, 0) rotate(1.5deg);
+      }
+      100% {
+        transform: translate3d(0, -4px, 0) rotate(-1deg);
+      }
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.9rem;
+    }
+
+    .hero-card-avatar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .hero-card-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      border: 2px solid rgba(248,250,252,0.9);
+      background: radial-gradient(circle at 30% 20%, #f97316, #4f46e5);
+      overflow: hidden;
+      box-shadow:
+        0 0 18px rgba(248,250,252,0.6),
+        0 0 36px rgba(96,165,250,0.6);
+    }
+
+    .hero-card-avatar img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .hero-card-name {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .hero-card-name strong {
+      font-size: 0.95rem;
+    }
+
+    .hero-card-name span {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .hero-card-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.2rem 0.6rem;
+      color: var(--muted);
+      background: rgba(15,23,42,0.7);
+    }
+
+    .hero-card-body {
+      border-radius: 1.1rem;
+      background: radial-gradient(circle at 0 0, rgba(251,113,133,0.18), transparent 55%),
+                  radial-gradient(circle at 100% 100%, rgba(37,99,235,0.35), transparent 55%);
+      border: 1px solid rgba(148,163,184,0.4);
+      padding: 0.85rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .hero-card-body-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(226,232,240,0.9);
+      margin-bottom: 0.35rem;
+    }
+
+    .hero-card-body p {
+      line-height: 1.5;
+    }
+
+    .hero-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.95rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .hero-card-stats {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .hero-card-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .hero-card-stat span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(148,163,184,0.8);
+    }
+
+    .hero-card-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      color: var(--accent-strong);
+    }
+
+    .hero-card-github-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(248,250,252,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+
+    .hero-card-orbit {
+      position: absolute;
+      inset: -40%;
+      border-radius: 999px;
+      border: 1px dashed rgba(148,163,184,0.2);
+      animation: orbit 18s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes orbit {
+      to {
+        transform: rotate(1turn);
+      }
+    }
+
+    /* Section titles */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .section-title-badge {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #f97316, #a855f7);
+      box-shadow: 0 0 18px rgba(168,85,247,0.9);
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 380px;
+    }
+
+    /* About & Skills */
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      border-radius: 1.3rem;
+      background: radial-gradient(circle at 0 0, rgba(148,163,184,0.18), transparent 55%),
+                  linear-gradient(145deg, rgba(15,23,42,0.95), rgba(15,23,42,0.7));
+      border: 1px solid var(--border-subtle);
+      padding: 1.1rem 1.2rem 1.35rem;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      width: 140%;
+      height: 2px;
+      left: -20%;
+      top: 0;
+      background: linear-gradient(90deg, transparent, rgba(148,163,184,0.6), transparent);
+      opacity: 0.6;
+    }
+
+    .card h3 {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(226,232,240,0.85);
+      margin-bottom: 0.6rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .list {
+      list-style: none;
+      margin-top: 0.75rem;
+      display: grid;
+      gap: 0.45rem;
+      font-size: 0.9rem;
+    }
+
+    .list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      color: var(--muted);
+    }
+
+    .list li::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      margin-top: 0.4rem;
+      background: linear-gradient(135deg, var(--accent-strong), #f97316);
+      box-shadow: 0 0 10px rgba(168,85,247,0.8);
+      flex-shrink: 0;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+
+    .pill {
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      font-size: 0.75rem;
+      color: rgba(226,232,240,0.92);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .pill span {
+      color: var(--muted);
+    }
+
+    /* Projects */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.1rem;
+    }
+
+    @media (max-width: 960px) {
+      .projects-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .projects-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .project-card {
+      border-radius: 1.15rem;
+      background: radial-gradient(circle at 0 0, rgba(59,130,246,0.25), transparent 55%),
+                  linear-gradient(145deg, rgba(15,23,42,0.98), rgba(15,23,42,0.8));
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.95rem 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, border-color 0.18s ease-out, background 0.18s ease-out;
+      cursor: pointer;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow:
+        0 18px 36px rgba(15,23,42,0.9),
+        0 0 36px rgba(129,140,248,0.7);
+      border-color: var(--accent-strong);
+      background: radial-gradient(circle at 100% 0, rgba(236,72,153,0.3), transparent 60%),
+                  linear-gradient(145deg, rgba(15,23,42,0.98), rgba(15,23,42,0.9));
+    }
+
+    .project-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(226,232,240,0.85);
+      margin-bottom: 0.2rem;
+    }
+
+    .project-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .project-name span {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: none;
+      letter-spacing: 0.04em;
+    }
+
+    .project-description {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 0.1rem;
+    }
+
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .project-meta-tags {
+      display: inline-flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .project-meta-tag {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      color: var(--accent-strong);
+    }
+
+    .project-orbit-line {
+      position: absolute;
+      inset: 60% -40%;
+      border-radius: 999px;
+      border: 1px dashed rgba(148,163,184,0.25);
+      mix-blend-mode: screen;
+      transform: rotate(-8deg);
+    }
+
+    /* Timeline / Currently */
+    .timeline {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .timeline {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .timeline-steps {
+      border-left: 1px solid rgba(148,163,184,0.4);
+      padding-left: 1rem;
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 0.2rem;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -1.28rem;
+      top: 0.22rem;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #22c55e, #a855f7);
+      box-shadow: 0 0 18px rgba(34,197,94,0.9);
+    }
+
+    .timeline-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: rgba(148,163,184,0.9);
+      margin-bottom: 0.15rem;
+    }
+
+    .timeline-title {
+      font-size: 0.92rem;
+      color: var(--text);
+      margin-bottom: 0.1rem;
+    }
+
+    .timeline-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .languages-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .language-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .language-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.18rem 0.7rem;
+      color: rgba(226,232,240,0.92);
+      background: rgba(15,23,42,0.9);
+    }
+
+    /* Contact */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+      gap: 1.7rem;
+    }
+
+    @media (max-width: 900px) {
+      .contact-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .contact-info {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .contact-highlight {
+      margin-top: 0.7rem;
+      border-radius: 1.2rem;
+      padding: 0.7rem 0.8rem;
+      background: radial-gradient(circle at 0 0, rgba(34,197,94,0.25), transparent 60%);
+      border: 1px solid rgba(34,197,94,0.5);
+      font-size: 0.85rem;
+      color: rgba(226,232,240,0.9);
+      display: flex;
+      gap: 0.55rem;
+      align-items: flex-start;
+    }
+
+    .contact-highlight span.icon {
+      margin-top: 0.1rem;
+    }
+
+    .contact-links {
+      margin-top: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.86rem;
+    }
+
+    .contact-link-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--muted);
+    }
+
+    .contact-link-row a {
+      color: var(--accent-strong);
+      text-decoration: none;
+    }
+
+    .contact-link-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .contact-form {
+      border-radius: 1.3rem;
+      background: linear-gradient(145deg, rgba(15,23,42,0.95), rgba(15,23,42,0.8));
+      border: 1px solid rgba(148,163,184,0.45);
+      padding: 1rem 1.1rem 1.2rem;
+      display: grid;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .contact-form-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0.7rem;
+    }
+
+    @media (max-width: 700px) {
+      .contact-form-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .field label {
+      font-size: 0.8rem;
+      color: rgba(209,213,219,0.95);
+    }
+
+    .field span.hint {
+      font-size: 0.7rem;
+      color: rgba(148,163,184,0.9);
+    }
+
+    .field input,
+    .field textarea {
+      border-radius: 0.85rem;
+      border: 1px solid rgba(148,163,184,0.75);
+      background: rgba(15,23,42,0.95);
+      padding: 0.45rem 0.6rem;
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+      width: 100%;
+      resize: vertical;
+      min-height: 0;
+    }
+
+    .field textarea {
+      min-height: 120px;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: rgba(148,163,184,0.9);
+    }
+
+    .contact-form small {
+      font-size: 0.72rem;
+      color: rgba(148,163,184,0.9);
+    }
+
+    footer {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 1.4rem 1.6rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      border-top: 1px solid rgba(15,23,42,0.8);
+      margin-top: 0.4rem;
+    }
+
+    footer a {
+      color: rgba(209,213,219,0.9);
+      text-decoration: none;
+    }
+
+    @media (max-width: 640px) {
+      footer {
+        flex-direction: column;
+      }
+      .nav {
+        padding-inline: 1rem;
+      }
+      main {
+        padding-inline: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="cursor-dot"></div>
+  <div class="cursor-outline"></div>
+  <div class="glow-top"></div>
+
+  <div class="page">
+    <header>
+      <nav class="nav">
+        <div class="logo">
+          <div class="logo-mark"></div>
+          <span>Razdnut</span>
+        </div>
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+          <a href="https://github.com/Razdnut" target="_blank" rel="noopener noreferrer" class="nav-cta" data-cursor-hover>
+            <span class="icon">★</span>
+            <span>GitHub Profile</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="hero reveal">
+        <div>
+          <div class="hero-kicker">
+            <div class="hero-kicker-dot"></div>
+            <span>Self-hosting • App Development • Vibe Coding</span>
+          </div>
+          <h1 class="hero-title">
+            Ciao, sono <span class="highlight">Razdnut</span><br/>
+            e vivo tra <span class="highlight">Next.js</span>, <span class="highlight">React</span> e server auto-hostati.
+          </h1>
+          <p class="hero-subtitle">
+            Appassionato di <strong>self-hosting</strong> e di <strong>app development</strong>, principalmente con Next.js e React.
+            Ho vissuto tranquillo, poi ho comprato un server e ho scoperto GitHub.
+          </p>
+
+          <div class="hero-tags">
+            <div class="tag">Frontend • <span>Next.js • React</span></div>
+            <div class="tag">Backend • <span>PHP • Node.js (basic)</span></div>
+            <div class="tag">Self-hosting • <span>Docker • VPS</span></div>
+            <div class="tag">Studying • <span>Python</span></div>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#projects" class="btn btn-primary" data-cursor-hover>
+              <span>Esplora i progetti</span>
+              <span class="arrow">↗</span>
+            </a>
+            <a href="#contact" class="btn btn-ghost" data-cursor-hover>
+              <span>Parliamo di un’idea</span>
+              <span class="arrow">✉</span>
+            </a>
+          </div>
+
+          <div class="hero-meta">
+            <div class="hero-meta-item">
+              <div class="hero-meta-dot"></div>
+              <span>Basato in Italia • sempre curioso di nuove tecnologie</span>
+            </div>
+            <div class="hero-meta-item">
+              <div class="hero-meta-dot"></div>
+              <span>Attivo su GitHub con <strong>audiodiary</strong>, <strong>torna_a_casa</strong> e altro</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-card">
+            <div class="hero-card-orbit"></div>
+            <div class="hero-card-header">
+              <div class="hero-card-avatar-wrap">
+                <div class="hero-card-avatar">
+                  <img src="https://github.com/Razdnut.png" alt="Avatar di Razdnut">
+                </div>
+                <div class="hero-card-name">
+                  <strong>Razdnut</strong>
+                  <span>Self-hosting & App Developer</span>
+                </div>
+              </div>
+              <div class="hero-card-badge">
+                PROFILE STATUS • LIVE
+              </div>
+            </div>
+            <div class="hero-card-body">
+              <div class="hero-card-body-title">About</div>
+              <p>
+                Passionate about self-hosting and application development, mainly using Next.js and React.
+                Currently vibing with code, learning Python and pushing my stack a bit further ogni giorno.
+              </p>
+            </div>
+            <div class="hero-card-footer">
+              <div class="hero-card-stats">
+                <div class="hero-card-stat">
+                  <span class="dot"></span>
+                  <span>Frontend • Next.js / React</span>
+                </div>
+                <div class="hero-card-stat">
+                  <span class="dot"></span>
+                  <span>Languages • IT / EN (B2)</span>
+                </div>
+              </div>
+              <a href="https://github.com/Razdnut" class="hero-card-github" target="_blank" rel="noopener noreferrer" data-cursor-hover>
+                <span class="hero-card-github-icon">GH</span>
+                <span>Open GitHub</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT + SKILLS -->
+      <section id="about" class="reveal">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-title-badge"></span>
+            About & Tech Stack
+          </h2>
+          <p class="section-subtitle">
+            Una panoramica veloce su chi sono, cosa sto studiando in questo periodo e quali tecnologie uso più spesso.
+          </p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3>Profile</h3>
+            <p>
+              Passionate about self-hosting. Application development mainly using Next.js and React.
+              Ho vissuto la mia vita in modo tranquillo, poi ho comprato un server e ho scoperto GitHub.
+              Ora mi concentro molto sul <strong>vibe coding</strong>, sperimentando e migliorando costantemente.
+            </p>
+            <ul class="list">
+              <li>Costruisco e perfeziono app moderne con stack JavaScript/TypeScript.</li>
+              <li>Mi piace integrare servizi self-hosted, API e automazioni nella vita reale.</li>
+              <li>Sto studiando <strong>Python</strong> per ampliare ulteriormente le possibilità lato scripting e backend.</li>
+            </ul>
+          </div>
+
+          <div id="skills" class="card">
+            <h3>Technical Skills</h3>
+            <div class="pill-row">
+              <div class="pill"><span>Frontend</span> • Next.js, React, HTML, CSS</div>
+              <div class="pill"><span>Backend</span> • PHP, basic Node.js</div>
+              <div class="pill"><span>Languages</span> • C, C#</div>
+              <div class="pill"><span>Tools</span> • Git & GitHub, VS Code, Postman</div>
+              <div class="pill"><span>Currently</span> • Studying Python</div>
+            </div>
+            <ul class="list">
+              <li>Mi piace creare interfacce moderne, fluide e ben animate (dark mode approved).</li>
+              <li>Uso GitHub come hub per testare idee, tool e piccole app personali.</li>
+              <li>Sempre aperto a nuove librerie, framework e strumenti da integrare nel mio ecosistema.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section id="projects" class="reveal">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-title-badge"></span>
+            Featured Projects
+          </h2>
+          <p class="section-subtitle">
+            Alcuni dei progetti evidenziati dal profilo GitHub: app reali, idee personali e playground per nuove tecnologie.
+          </p>
+        </div>
+
+        <div class="projects-grid">
+          <!-- Audiodiary -->
+          <article class="project-card" data-cursor-hover onclick="window.open('https://github.com/Razdnut/audiodiary', '_blank')">
+            <div class="project-orbit-line"></div>
+            <div class="project-badge">Audio & AI</div>
+            <div class="project-name">
+              <span>audiodiary</span>
+              <span>TS • Next.js</span>
+            </div>
+            <p class="project-description">
+              Personal diary basato su note vocali che vengono trascritte e sintetizzate tramite Whisper model
+              e OpenAI API key. Un modo moderno per catturare pensieri a voce.
+            </p>
+            <div class="project-meta">
+              <div class="project-meta-tags">
+                <span class="project-meta-tag">Whisper</span>
+                <span class="project-meta-tag">OpenAI</span>
+                <span class="project-meta-tag">Self-host friendly</span>
+              </div>
+              <div class="project-link">
+                <span>View repo</span>
+                <span>↗</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Torna a casa -->
+          <article class="project-card" data-cursor-hover onclick="window.open('https://github.com/Razdnut/torna_a_casa', '_blank')">
+            <div class="project-orbit-line"></div>
+            <div class="project-badge">Productivity</div>
+            <div class="project-name">
+              <span>torna_a_casa</span>
+              <span>TypeScript</span>
+            </div>
+            <p class="project-description">
+              Piccola app (anche mobile-oriented) per il monitoraggio dell’orario di lavoro:
+              un modo semplice per capire quando è il momento di “tornare a casa”.
+            </p>
+            <div class="project-meta">
+              <div class="project-meta-tags">
+                <span class="project-meta-tag">Work-time tracking</span>
+                <span class="project-meta-tag">UX minimal</span>
+              </div>
+              <div class="project-link">
+                <span>View repo</span>
+                <span>↗</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Web scraper -->
+          <article class="project-card" data-cursor-hover onclick="window.open('https://github.com/Razdnut/web_scraper', '_blank')">
+            <div class="project-orbit-line"></div>
+            <div class="project-badge">Python Lab</div>
+            <div class="project-name">
+              <span>web_scraper</span>
+              <span>Python</span>
+            </div>
+            <p class="project-description">
+              Small webscraper in Python, perfetto come sandbox per esercitarsi con automazioni, parsing HTML
+              e raccolta dati da siti web.
+            </p>
+            <div class="project-meta">
+              <div class="project-meta-tags">
+                <span class="project-meta-tag">Requests / parsing</span>
+                <span class="project-meta-tag">CLI vibes</span>
+              </div>
+              <div class="project-link">
+                <span>View repo</span>
+                <span>↗</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div style="margin-top:1.1rem; display:flex; justify-content:flex-end;">
+          <a href="https://github.com/Razdnut?tab=repositories" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" data-cursor-hover>
+            <span>Vedi tutti i repository</span>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- CURRENTLY / LANGUAGES -->
+      <section class="reveal">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-title-badge"></span>
+            Currently & Languages
+          </h2>
+          <p class="section-subtitle">
+            Cosa sto facendo ora e in quali lingue posso comunicare senza far crashare lo stack cerebrale.
+          </p>
+        </div>
+
+        <div class="timeline">
+          <div class="card">
+            <h3>Currently</h3>
+            <div class="timeline-steps">
+              <div class="timeline-item">
+                <div class="timeline-label">Learning</div>
+                <div class="timeline-title">Python</div>
+                <p class="timeline-text">
+                  Sto studiando Python per ampliare il mio skill-set, soprattutto per scripting, automazioni e piccoli backend
+                  che si integrano con servizi self-hosted e API esterne.
+                </p>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-label">Focus</div>
+                <div class="timeline-title">Self-hosting & App Development</div>
+                <p class="timeline-text">
+                  Continuo a sperimentare con server personali, servizi dockerizzati e applicazioni web,
+                  cercando sempre combinazioni nuove tra UX moderna e infrastruttura stabile.
+                </p>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-label">Mindset</div>
+                <div class="timeline-title">Always open</div>
+                <p class="timeline-text">
+                  Sempre aperto a nuove tecnologie e linguaggi di programmazione: se è interessante e hackabile,
+                  probabilmente finirà in un repo.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card languages-card">
+            <h3>Languages</h3>
+            <div class="language-row">
+              <span>Italiano</span>
+              <span class="language-badge">Native</span>
+            </div>
+            <div class="language-row">
+              <span>English</span>
+              <span class="language-badge">B2 (FCE)</span>
+            </div>
+            <p style="margin-top:0.6rem; font-size:0.85rem; color:var(--muted);">
+              Documentazione, commit message, README e UI possono essere sia in italiano che in inglese,
+              a seconda del progetto e del contesto.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="reveal">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-title-badge"></span>
+            Contact
+          </h2>
+          <p class="section-subtitle">
+            Hai un’idea, un side-project o vuoi solo parlare di self-hosting, Next.js o API strane?
+            Qui trovi il modo per raggiungermi.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+          <div>
+            <div class="contact-info">
+              Preferisco tenere la comunicazione semplice: GitHub rimane il punto di partenza, ma da lì
+              si può tranquillamente passare a qualsiasi altro canale.
+            </div>
+            <div class="contact-highlight">
+              <span class="icon">⚡</span>
+              <span>
+                Proposte di collaborazioni, idee di app, widget, tool per il self-hosting,
+                automazioni... se pensi che possa divertirmi, probabilmente è la direzione giusta.
+              </span>
+            </div>
+            <div class="contact-links">
+              <div class="contact-link-row">
+                <div class="contact-link-badge">GH</div>
+                <span>
+                  GitHub • <a href="https://github.com/Razdnut" target="_blank" rel="noopener noreferrer">github.com/Razdnut</a>
+                </span>
+              </div>
+              <div class="contact-link-row">
+                <div class="contact-link-badge">★</div>
+                <span>
+                  Stars & Issues • feel free to open <code>issues</code> o lasciare una <code>star</code> sui progetti che ti piacciono.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-form">
+            <div class="contact-form-row">
+              <div class="field">
+                <label>Nome</label>
+                <input type="text" placeholder="Il tuo nome" />
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <input type="email" placeholder="you@example.com" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Oggetto</label>
+              <input type="text" placeholder="Collaborazione, idea di app, domanda tecnica..." />
+            </div>
+            <div class="field">
+              <label>Messaggio</label>
+              <textarea placeholder="Scrivi il tuo messaggio qui. (Questo form è solo UI demo, connettilo a un backend o servizio a tua scelta.)"></textarea>
+              <span class="hint">Tip: puoi collegare questo form a un endpoint self-hosted o a un servizio serverless.</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem;">
+              <button type="button" class="btn btn-primary" data-cursor-hover>
+                <span>Invia (demo)</span>
+                <span class="arrow">↗</span>
+              </button>
+              <small>
+                Form non collegato – perfetto punto di partenza per integrare il tuo backend (PHP, Node, Python… a scelta).
+              </small>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>
+        © <span id="year"></span> Razdnut • Built with vibes, self-hosting & a dark purple theme.
+      </div>
+      <div>
+        Based on public data from <a href="https://github.com/Razdnut" target="_blank" rel="noopener noreferrer">GitHub profile</a>.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Footer year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Scroll reveal
+    const revealElements = document.querySelectorAll(".reveal");
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.18 }
+    );
+    revealElements.forEach((el) => revealObserver.observe(el));
+
+    // Custom animated cursor
+    const cursorDot = document.querySelector(".cursor-dot");
+    const cursorOutline = document.querySelector(".cursor-outline");
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let outlineX = mouseX;
+    let outlineY = mouseY;
+
+    const updateCursor = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+    };
+
+    window.addEventListener("mousemove", updateCursor);
+
+    const animateOutline = () => {
+      outlineX += (mouseX - outlineX) * 0.16;
+      outlineY += (mouseY - outlineY) * 0.16;
+      cursorOutline.style.transform = `translate(${outlineX}px, ${outlineY}px)`;
+      requestAnimationFrame(animateOutline);
+    };
+    animateOutline();
+
+    // Hover effect on interactive elements
+    const hoverables = document.querySelectorAll("[data-cursor-hover], a, button, .project-card");
+    hoverables.forEach((el) => {
+      el.addEventListener("mouseenter", () => {
+        cursorOutline.classList.add("cursor-hover");
+      });
+      el.addEventListener("mouseleave", () => {
+        cursorOutline.classList.remove("cursor-hover");
+      });
+    });
+
+    // Hide cursor if leaving window
+    window.addEventListener("mouseleave", () => {
+      cursorDot.style.opacity = "0";
+      cursorOutline.style.opacity = "0";
+    });
+    window.addEventListener("mouseenter", () => {
+      cursorDot.style.opacity = "1";
+      cursorOutline.style.opacity = "1";
+    });
+
+    // Interactive particle background (canvas)
+    const canvas = document.getElementById("bg-canvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let mouse = { x: null, y: null };
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initParticles();
+    };
+
+    window.addEventListener("resize", resizeCanvas);
+
+    window.addEventListener("mousemove", (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    const createParticle = () => {
+      const size = Math.random() * 2 + 0.5;
+      const speed = 0.2 + Math.random() * 0.4;
+      const angle = Math.random() * Math.PI * 2;
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size,
+        alpha: 0.4 + Math.random() * 0.3
+      };
+    };
+
+    const initParticles = () => {
+      const count = Math.min(140, Math.floor((canvas.width * canvas.height) / 18000));
+      particles = [];
+      for (let i = 0; i < count; i++) {
+        particles.push(createParticle());
+      }
+    };
+
+    const drawParticles = () => {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Trail effect
+      ctx.fillStyle = "rgba(3, 0, 12, 0.65)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p) => {
+        // simple mouse interaction: gentle repulsion
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = p.x - mouse.x;
+          const dy = p.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const radius = 120;
+          if (dist < radius && dist > 0) {
+            const force = (radius - dist) / radius;
+            p.vx += (dx / dist) * force * 0.06;
+            p.vy += (dy / dist) * force * 0.06;
+          }
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Wrap around edges
+        if (p.x < -10) p.x = canvas.width + 10;
+        if (p.x > canvas.width + 10) p.x = -10;
+        if (p.y < -10) p.y = canvas.height + 10;
+        if (p.y > canvas.height + 10) p.y = -10;
+
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 6);
+        gradient.addColorStop(0, `rgba(192,132,252,${p.alpha})`);
+        gradient.addColorStop(0.4, `rgba(129,140,248,${p.alpha * 0.7})`);
+        gradient.addColorStop(1, "rgba(15,23,42,0)");
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(drawParticles);
+    };
+
+    resizeCanvas();
+    drawParticles();
+  </script>
+</body>
+</html>
