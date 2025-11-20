@@ -49,6 +49,10 @@ _I am currently studying **Python**._
 | --- | --- | --- |
 | **Audiodiary** | AudioDiary with Whisper Api model. | [GitHub](https://github.com/Razdnut/audiodiary) |
 | **Torna a Casa** | Small android app for monitor work-time | [GitHub](https://github.com/Razdnut/torna_a_casa) |
+| **GenMe**<img width="24" height="24" alt="new" src="https://github.com/user-attachments/assets/c3b5db03-a092-4d41-b443-75117aa475de" /> |  Readme markdown generator AI  | [GitHub](https://github.com/Razdnut/genme) |
+
+[GenMe -Try It ⭐⭐⭐⭐⭐](https://razdnut.github.io/genme/)
+
 
 ---
 
